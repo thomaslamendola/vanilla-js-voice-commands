@@ -1,7 +1,7 @@
 let isListening = false;
 let initiationCommand = "hey there";
 
-let commands = {
+let colorCommands = {
     'lights off': 'black',
     'lights on': 'white',
     'red': 'red',
@@ -10,6 +10,15 @@ let commands = {
     'yellow': 'yellow',
     'green': 'green'
 };
+
+let actionCommands = {
+    'one': 'one',
+    'two': 'two',
+    'three': 'three',
+    '1': 'one',
+    '2': 'two',
+    '3': 'three'
+}
 
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
@@ -36,9 +45,27 @@ recognition.addEventListener('end', recognition.start);
 recognition.start();
 
 function handleCommand(t) {
-    Object.keys(commands).forEach(function (key) {
+    Object.keys(colorCommands).forEach(function (key) {
         if (t.toLowerCase().indexOf(key) > -1) {
-            document.bgColor = commands[key];
+            document.bgColor = colorCommands[key];
+            isListening = false;
+            document.getElementById("mic-icon").classList.toggle("mic-disabled");
+            document.getElementById("mic-icon").classList.toggle("mic-enabled");
+        }
+    });
+    
+    Object.keys(actionCommands).forEach(function (key) {
+        if (t.toLowerCase().indexOf(key) > -1) {
+            let reference = actionCommands[key];
+            let checkboxes = document.getElementsByTagName("input");
+
+            for (let checkbox of checkboxes) {
+                let currentValue = checkbox.getAttribute("audio-tag");
+                if(reference === currentValue) {
+                    checkbox.checked = true;
+                }
+            }
+
             isListening = false;
             document.getElementById("mic-icon").classList.toggle("mic-disabled");
             document.getElementById("mic-icon").classList.toggle("mic-enabled");
