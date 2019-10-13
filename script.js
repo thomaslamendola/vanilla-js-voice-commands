@@ -22,6 +22,7 @@ let actionCommands = {
 
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
+// recognition.lang = 'it-IT';
 
 recognition.addEventListener('result', e => {
     const transcript = Array.from(e.results)
