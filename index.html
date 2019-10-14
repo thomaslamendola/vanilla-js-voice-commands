@@ -47,11 +47,13 @@
     <div id="mic-icon" class="mic-disabled">
         <img src="mic.svg" class="centered-image" alt="Microphone icon">
     </div>
-    <br>
-    <h2>Make your selection (say "hey there", followed by the number of your choice)</h2>
-    1 <input type="checkbox" audio-tag="one" name="test" id="one"><br>
-    2 <input type="checkbox" audio-tag="two" name="test" id="two"><br>
-    3 <input type="checkbox" audio-tag="three" name="test" id="three"><br>
+    <br><br><br>
+    <select name="language" id="language" onchange="changeLang(event)">
+        <option value="en-ZA" selected>English</option>
+        <option value="it-IT">Italian</option>
+        <option value="fr-FR">French</option>
+    </select>
+    <section id="commands"></section>
     <script type="text/javascript" src="script.js"></script>
 </body>
 

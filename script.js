@@ -1,41 +1,97 @@
 let isListening = false;
-let initiationCommand = "hey there";
 
-let colorCommands = {
-    'lights off': 'black',
-    'lights on': 'white',
-    'red': 'red',
-    'pink': 'pink',
-    'blue': 'blue',
-    'yellow': 'yellow',
-    'green': 'green'
+let lang = 'en-ZA';
+
+let initiationCommand = {
+    'en-ZA': 'listen to me',
+    'it-IT': 'mamma mia',
+    'fr-FR':'bonjour'
+}
+
+let commands = {
+    'en-ZA': {
+        'change_theme': {
+            'verb': ['change', 'swap', 'toggle', 'set'],
+            'object': ['theme', 'dark theme', 'light theme'],
+            'metadata': [],
+            'payload': {
+                'eventName': 'change_theme'
+            }
+        }
+    },
+    'it-IT': {
+        'change_theme': {
+            'verb': ['cambia', 'cambiare', 'inverti', 'invertire', 'imposta', 'impostare'],
+            'object': ['tema', 'tema chiaro', 'tema scuro'],
+            'metadata': [],
+            'payload': {
+                'eventName': 'change_theme'
+            }
+        }
+    }    ,
+    'fr-FR': {
+        'change_theme': {
+            'verb': ['change', 'définir'],
+            'object': ['thème', 'thème sombre', 'thème lumière'],
+            'metadata': [],
+            'payload': {
+                'eventName': 'change_theme'
+            }
+        }
+    }
 };
 
-let actionCommands = {
-    'one': 'one',
-    'two': 'two',
-    'three': 'three',
-    '1': 'one',
-    '2': 'two',
-    '3': 'three'
+let commandList = document.getElementById('commands');
+
+function setListeningStatus(status) {
+    switch (status) {
+        case true:
+            isListening = true;
+            document.getElementById('mic-icon').classList.toggle('mic-disabled');
+            document.getElementById('mic-icon').classList.toggle('mic-enabled');
+            break;
+        case false:
+            isListening = false;
+            document.getElementById('mic-icon').classList.toggle('mic-disabled');
+            document.getElementById('mic-icon').classList.toggle('mic-enabled');
+            break;
+    }
+}
+
+function isMatchFound(sentence, word) {
+    return sentence.toLowerCase().indexOf(word) > -1
+}
+
+function isCommandMatched(sentence, command) {
+    let result = false;
+    if (command['verb'].some(verb => isMatchFound(sentence, verb))) {
+        if (command['object'].some(obj => isMatchFound(sentence, obj))) {
+            result = true;
+        }
+    }
+    return result;
 }
 
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
-// recognition.lang = 'it-IT';
+
+recognition.lang = lang;
+
+function changeLang(ev) {
+    lang = ev.target.value
+    recognition.lang = lang;
+}
 
 recognition.addEventListener('result', e => {
     const transcript = Array.from(e.results)
         .map(result => result[0])
         .map(result => result.transcript)
-        .join('')
+        .join('');
 
     console.log(transcript);
 
-    if (transcript.toLowerCase().indexOf(initiationCommand) > -1) {
-        isListening = true;
-        document.getElementById("mic-icon").classList.toggle("mic-disabled");
-        document.getElementById("mic-icon").classList.toggle("mic-enabled");
+    if (isMatchFound(transcript, initiationCommand[lang])) {
+        setListeningStatus(true);
     } else if (isListening) {
         handleCommand(transcript);
     }
@@ -45,31 +101,23 @@ recognition.addEventListener('result', e => {
 recognition.addEventListener('end', recognition.start);
 recognition.start();
 
+function print(message) {
+    let p = document.createElement('p');
+    p.textContent = message;
+    commandList.appendChild(p);
+}
+
 function handleCommand(t) {
-    Object.keys(colorCommands).forEach(function (key) {
-        if (t.toLowerCase().indexOf(key) > -1) {
-            document.bgColor = colorCommands[key];
-            isListening = false;
-            document.getElementById("mic-icon").classList.toggle("mic-disabled");
-            document.getElementById("mic-icon").classList.toggle("mic-enabled");
+    let handled = false;
+    Object.keys(commands[lang]).forEach(function (key) {
+        let command = commands[lang][key];
+        if (isCommandMatched(t, command)) {
+            handled = true;
+            print(`${JSON.stringify(command['payload'])} was sent through the event bus...`);
+            setListeningStatus(false);
         }
     });
-    
-    Object.keys(actionCommands).forEach(function (key) {
-        if (t.toLowerCase().indexOf(key) > -1) {
-            let reference = actionCommands[key];
-            let checkboxes = document.getElementsByTagName("input");
-
-            for (let checkbox of checkboxes) {
-                let currentValue = checkbox.getAttribute("audio-tag");
-                if(reference === currentValue) {
-                    checkbox.checked = true;
-                }
-            }
-
-            isListening = false;
-            document.getElementById("mic-icon").classList.toggle("mic-disabled");
-            document.getElementById("mic-icon").classList.toggle("mic-enabled");
-        }
-    });
+    if (!handled) {
+        print('Sorry, can you please say it again... I am still learning! :)')
+    }
 }
