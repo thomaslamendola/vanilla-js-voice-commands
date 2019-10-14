@@ -5,7 +5,8 @@ let lang = 'en-ZA';
 let initiationCommand = {
     'en-ZA': 'listen to me',
     'it-IT': 'mamma mia',
-    'fr-FR':'bonjour'
+    'fr-FR':'bonjour',
+    'af-ZA':'goeie-more'
 }
 
 let commands = {
@@ -28,11 +29,21 @@ let commands = {
                 'eventName': 'change_theme'
             }
         }
-    }    ,
+    },
     'fr-FR': {
         'change_theme': {
             'verb': ['change', 'définir'],
             'object': ['thème', 'thème sombre', 'thème lumière'],
+            'metadata': [],
+            'payload': {
+                'eventName': 'change_theme'
+            }
+        }
+    },
+    'af-ZA': {
+        'change_theme': {
+            'verb': ['verander'],
+            'object': ['tema'],
             'metadata': [],
             'payload': {
                 'eventName': 'change_theme'
